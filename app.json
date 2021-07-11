@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ioBroker.material",
-    "slug": "ioBroker.material",
+    "slug": "ioBroker-material",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
