@@ -53,3 +53,4 @@ buck-out/
 .expo/
 web-build/
 /package-lock.json
+yarn.lock
