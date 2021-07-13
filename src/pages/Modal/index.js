@@ -1,27 +1,27 @@
-import { Text } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
-import styled from "styled-components";
+import { Text } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import {
   h_normalize,
   styled_t_r_b_l_normalize,
   w_normalize,
-} from "../../services/helpers/normalizeSize";
-import BaseButton from "../../components/BaseButton";
-import { resources } from "../../services/locales";
-import { TouchableOpacity } from "react-native";
-import { useTranslation } from "react-i18next";
-import wifi from "../../../assets/wifi.png";
-import see from "../../../assets/see.png";
-import BaseTextInput from "../../components/BaseTextInput";
-import BaseSwitch from "../../components/BaseSwitch";
-import { TouchableWithoutFeedback } from "react-native";
-import { Keyboard } from "react-native";
-import { PermissionsAndroid } from "react-native";
-import WifiManager from "react-native-wifi-reborn";
-import { ContextWrapperCreate } from "../../components/ContextWrapper";
+} from '../../services/helpers/normalizeSize';
+import BaseButton from '../../components/BaseButton';
+import { resources } from '../../services/locales';
+import { TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import wifi from '../../../assets/wifi.png';
+import see from '../../../assets/see.png';
+import BaseTextInput from '../../components/BaseTextInput';
+import BaseSwitch from '../../components/BaseSwitch';
+import { TouchableWithoutFeedback } from 'react-native';
+import { Keyboard } from 'react-native';
+import { PermissionsAndroid } from 'react-native';
+import WifiManager from 'react-native-wifi-reborn';
+import { ContextWrapperCreate } from '../../components/ContextWrapper';
 
 const shadow = {
-  shadowColor: "#000",
+  shadowColor: '#000',
   shadowOffset: {
     width: 5,
     height: 5,
@@ -34,28 +34,28 @@ const shadow = {
 
 const style = {
   smallText: {
-    fontWeight: "bold",
-    textShadowColor: "rgba(44, 27, 147, 0.7)",
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(44, 27, 147, 0.7)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 10,
     fontSize: w_normalize(24),
-    color: "silver",
+    color: 'silver',
     opacity: 0.6,
   },
   bigText: {
-    fontWeight: "bold",
-    textShadowColor: "rgba(44, 27, 147, 0.7)",
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(44, 27, 147, 0.7)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 10,
     fontSize: w_normalize(48),
-    color: "#FFFFFF",
+    color: '#FFFFFF',
   },
   line: {
-    position: "absolute",
-    borderBottomColor: "#580056",
+    position: 'absolute',
+    borderBottomColor: '#580056',
     borderBottomWidth: 1,
-    height: "50%",
-    width: "40%",
+    height: '50%',
+    width: '40%',
   },
 };
 
@@ -65,12 +65,12 @@ const Modal = ({ navigation, route: { params } }) => {
       PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         {
-          title: "Location permission is required for WiFi connections",
+          title: 'Location permission is required for WiFi connections',
           message:
-            "This app needs location permission as this is required  " +
-            "to scan for wifi networks.",
-          buttonNegative: "DENY",
-          buttonPositive: "ALLOW",
+            'This app needs location permission as this is required  ' +
+            'to scan for wifi networks.',
+          buttonNegative: 'DENY',
+          buttonPositive: 'ALLOW',
         }
       );
     })();
@@ -95,7 +95,7 @@ const Modal = ({ navigation, route: { params } }) => {
     >
       <Wrapper>
         <HeadWrapper style={shadow}>
-          <Heading>{t("Settings")}</Heading>
+          <Heading>{t('Settings')}</Heading>
           <WrapperSlider>
             <TouchableOpacity
               onPress={() => {
@@ -118,7 +118,7 @@ const Modal = ({ navigation, route: { params } }) => {
             >
               <Triangel
                 style={{
-                  transform: [{ rotate: "90deg" }],
+                  transform: [{ rotate: '90deg' }],
                 }}
               />
             </TouchableOpacity>
@@ -127,8 +127,25 @@ const Modal = ({ navigation, route: { params } }) => {
             <BaseTextInput
               onChangeText={localObj.setLocalValue}
               value={localObj.localValue}
-              placeholder={t("Local URL")}
+              placeholder={t('Local URL')}
               topText
+            />
+            <BaseTextInput
+              onChangeText={ssidObj.setSsidValue}
+              value={ssidObj.ssidValue}
+              placeholder={t('Local SSID')}
+              topText
+              icon={wifi}
+              onPressInIcon={() => {
+                WifiManager.getCurrentWifiSSID().then(
+                  (ssid) => {
+                    ssidObj.setSsidValue(ssid);
+                  },
+                  () => {
+                    ssidObj.setSsidValue('error');
+                  }
+                );
+              }}
             />
           </WrapperTextInput>
           <CermConditionsWrapper>
@@ -142,44 +159,28 @@ const Modal = ({ navigation, route: { params } }) => {
               onPress={() => switchObj.setSwitcValue(!switchObj.switchValue)}
             >
               <PreshTextCustom>
-                {t("Remote access via ioBroker.pro")}
+                {t('Remote access via ioBroker.pro')}
               </PreshTextCustom>
             </TouchableOpacity>
           </CermConditionsWrapper>
+
           {switchObj.switchValue && (
             <WrapperTextInput>
               <BaseTextInput
                 onChangeText={emailObj.setEmailValue}
                 value={emailObj.emailValue}
-                placeholder={t("Email")}
+                placeholder={t('Email')}
                 topText
               />
               <BaseTextInput
                 onChangeText={passwordObj.setPasswordValue}
                 value={passwordObj.passwordValue}
-                placeholder={t("Password")}
+                placeholder={t('Password')}
                 secureTextEntry={secure}
                 onPressInIcon={() => setSecure(false)}
                 onPressOutIcon={() => setSecure(true)}
                 icon={see}
                 topText
-              />
-              <BaseTextInput
-                onChangeText={ssidObj.setSsidValue}
-                value={ssidObj.ssidValue}
-                placeholder={t("Local SSID")}
-                topText
-                icon={wifi}
-                onPressInIcon={() => {
-                  WifiManager.getCurrentWifiSSID().then(
-                    (ssid) => {
-                      ssidObj.setSsidValue(ssid);
-                    },
-                    () => {
-                      ssidObj.setSsidValue("error");
-                    }
-                  );
-                }}
               />
             </WrapperTextInput>
           )}
@@ -190,7 +191,7 @@ const Modal = ({ navigation, route: { params } }) => {
               backgroundColor="#F8E71C"
               textColor="#444444"
             >
-              {t("Save")}
+              {t('Save')}
             </BaseButton>
             <BaseButton
               onPress={() => navigation.goBack()}
@@ -198,7 +199,7 @@ const Modal = ({ navigation, route: { params } }) => {
               backgroundColor="rgba(44, 27, 147, 0.2)"
               textColor="white"
             >
-              {t("Close")}
+              {t('Close')}
             </BaseButton>
           </ButtonWrapper>
         </HeadWrapper>

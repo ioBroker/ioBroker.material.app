@@ -18,6 +18,7 @@ const WebViewComponent = ({ navigation }) => {
           if (!url) {
             return;
           }
+          console.log(newNavState);
           if (url.includes('login?app=true')) {
             const newURL = 'https://iobroker.pro';
             const redirectTo = 'window.location = "' + newURL + '"';
@@ -25,7 +26,9 @@ const WebViewComponent = ({ navigation }) => {
           }
         }}
         source={
-          switchObj.switchValue
+          switchObj.switchValue &&
+          emailObj.emailValue &&
+          passwordObj.passwordValue
             ? {
                 uri: "https://iobroker.pro/login?app=true",
                 method: "POST",
