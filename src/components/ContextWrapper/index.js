@@ -4,7 +4,7 @@ import { useStateLocal } from "../../services/hooks/useStateLocal";
 export const ContextWrapperCreate = createContext();
 
 export const ContextWrapper = ({ children }) => {
-  const [switchValue, setSwitcValue] = useStateLocal(false, "switch");
+  const [switchValue, setSwitchValue] = useStateLocal(false, "switch");
   const [emailValue, setEmailValue] = useStateLocal("", "email");
   const [passwordValue, setPasswordValue] = useStateLocal("", "password");
   const [ssidValue, setSsidValue] = useStateLocal("", "ssid");
@@ -18,7 +18,7 @@ export const ContextWrapper = ({ children }) => {
       value={{
         switchObj: {
           switchValue,
-          setSwitcValue,
+          setSwitchValue,
         },
         emailObj: {
           emailValue,

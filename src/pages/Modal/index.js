@@ -150,13 +150,13 @@ const Modal = ({ navigation, route: { params } }) => {
           </WrapperTextInput>
           <CermConditionsWrapper>
             <BaseSwitch
-              onValueChange={switchObj.setSwitcValue}
+              onValueChange={switchObj.setSwitchValue}
               value={switchObj.switchValue}
               addTextOn=""
               addTextOff=" "
             />
             <TouchableOpacity
-              onPress={() => switchObj.setSwitcValue(!switchObj.switchValue)}
+              onPress={() => switchObj.setSwitchValue(!switchObj.switchValue)}
             >
               <PreshTextCustom>
                 {t('Remote access via ioBroker.pro')}

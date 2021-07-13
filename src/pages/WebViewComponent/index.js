@@ -1,46 +1,57 @@
-import React, { useContext, useRef } from "react";
-import { View } from "react-native";
-import { WebView } from "react-native-webview";
-import styled from "styled-components";
-import { ContextWrapperCreate } from "../../components/ContextWrapper";
-import MyTabBar from "../../components/MyTabBar";
+import React, {useContext, useRef, useState, useEffect} from 'react';
+import {View} from 'react-native';
+import {WebView} from 'react-native-webview';
+import styled from 'styled-components';
+import WifiManager from 'react-native-wifi-reborn';
 
-const WebViewComponent = ({ navigation }) => {
-  const { switchObj, emailObj, passwordObj, ssidObj, localObj } =
-    useContext(ContextWrapperCreate);
-  const refWebView = useRef();
-  return (
-    <WrapperWebView>
-      <WebViewContent
-        ref={refWebView}
-        onNavigationStateChange={(newNavState) => {
-          const { url } = newNavState;
-          if (!url) {
-            return;
-          }
-          console.log(newNavState);
-          if (url.includes('login?app=true')) {
-            const newURL = 'https://iobroker.pro';
-            const redirectTo = 'window.location = "' + newURL + '"';
-            refWebView.current?.injectJavaScript(redirectTo);
-          }
-        }}
-        source={
-          switchObj.switchValue &&
-          emailObj.emailValue &&
-          passwordObj.passwordValue
-            ? {
-                uri: "https://iobroker.pro/login?app=true",
-                method: "POST",
-                body: `username=${emailObj.emailValue}&password=${passwordObj.passwordValue}`,
-              }
-            : { uri: 'https://iobroker.net' }
+import {ContextWrapperCreate} from '../../components/ContextWrapper';
+import MyTabBar from '../../components/MyTabBar';
+
+const WebViewComponent = ({navigation}) => {
+    const {switchObj, emailObj, passwordObj, ssidObj, localObj} =
+        useContext(ContextWrapperCreate);
+
+    const [useLocal, setUseLocal] = useState(true);
+
+    const refWebView = useRef();
+
+    useEffect(() => {
+        if (ssidObj.ssidValue && switchObj.switchValue && emailObj.emailValue && passwordObj.passwordValue) {
+            WifiManager.getCurrentWifiSSID()
+                .then(
+                    ssid => ssid !== ssidObj.ssidValue && setUseLocal(false),
+                    () => setUseLocal(false)
+                );
         }
-        on
-      />
-      <MyTabBar navigation={navigation} />
-    </WrapperWebView>
-  );
+    });
+
+    return <WrapperWebView>
+        <WebViewContent
+            ref={refWebView}
+            onNavigationStateChange={(newNavState) => {
+                const {url} = newNavState;
+                if (!url) {
+                    return;
+                }
+                if (url.includes('login?app=true')) {
+                    const newURL = 'https://iobroker.pro/material/index.html?app=true';
+                    const redirectTo = `window.location = "${newURL}"`;
+                    refWebView.current?.injectJavaScript(redirectTo);
+                }
+            }}
+            source={
+                !useLocal
+                    ? {
+                        uri: 'https://iobroker.pro/login?app=true',
+                        method: 'POST',
+                        body: `username=${emailObj.emailValue}&password=${passwordObj.passwordValue}`,
+                    }
+                    : {uri: localObj.localValue}
+            }
+            on
+        />
+        <MyTabBar navigation={navigation}/>
+    </WrapperWebView>;
 };
 
 const WrapperWebView = styled(View)`
