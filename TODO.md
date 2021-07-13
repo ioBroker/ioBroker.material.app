@@ -1,16 +1,11 @@
-## Settings
-- Local URL: "http://localhost:8082"
-- Checkbox: Remote access via ioBroker.pro
-  - ioBroker.pro email,
-  - ioBroker.pro password
-  - Local SSID: "actual WiFi" [Use current]
+## Global
+- App Icon: https://raw.githubusercontent.com/ioBroker/ioBroker.material/master/src/public/favicon.ico
+- SplashScreen loading icon (material logo on black background)
 
- ## Logic
-  - By activation 
-   - Check if pro available
-   - If yes, check SSID 
-        - If current SSID === saved SSID => use local URL
-        - If not => https://iobroker.pro/material?user=aaaa&pass=blbla
+## Settings
+- Colors: grey and decent
+- Loading indicator
+## Logic
 
 ## img
 wifi https://www.flaticon.com/free-icon/wifi_159599?term=wifi&page=1&position=7
