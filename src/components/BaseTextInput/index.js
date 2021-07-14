@@ -40,12 +40,12 @@ const BaseTextInput = ({
       />
       {icon && (
         <Touchable
-          hitSlop={{
-            left: 20,
-            top: 120,
-            right: 20,
-            bottom: 20,
-          }}
+          // hitSlop={{
+          //   left: 20,
+          //   top: 120,
+          //   right: 20,
+          //   bottom: 20,
+          // }}
           onPressIn={onPressInIcon}
           onPressOut={onPressOutIcon}
         >
