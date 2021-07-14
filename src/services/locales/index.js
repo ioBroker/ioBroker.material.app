@@ -11,6 +11,8 @@ import pl from "./pl.json";
 import pt from "./pt.json";
 import zh from "./zh.json";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { NativeModules, Platform } from 'react-native';
+import * as RNLocalize from "react-native-localize";
 
 export const resources = {
   en: {
@@ -40,7 +42,7 @@ export const resources = {
   pt: {
     translation: pt,
   },
-  zh: {
+  'zh-cn': {
     translation: zh,
   },
 };
@@ -50,6 +52,17 @@ const languageDetector = {
   async: true,
   detect: async (language) => {
     const persistedLocale = await AsyncStorage.getItem("language");
+    const infoDevice = RNLocalize.getLocales();
+    if (infoDevice.length) {
+      const languageCode = infoDevice[0].languageCode;
+      const arrLang = Object.keys(resources);
+      if (languageCode) {
+        const keyLanguage = arrLang.find((key) => key.includes(languageCode));
+        if (keyLanguage) {
+          return language(keyLanguage);
+        }
+      }
+    }
     if (!persistedLocale) {
       return language("en");
     }

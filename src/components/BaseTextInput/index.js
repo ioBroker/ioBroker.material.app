@@ -1,11 +1,11 @@
 //Core
-import React, { useState } from 'react';
-import styled from 'styled-components/native';
+import React, { useState } from "react";
+import styled from "styled-components/native";
 import {
   styled_h_normalize,
   styled_t_r_b_l_normalize,
   w_normalize,
-} from '../../services/helpers/normalizeSize';
+} from "../../services/helpers/normalizeSize";
 
 const BaseTextInput = ({
   icon,
@@ -33,7 +33,7 @@ const BaseTextInput = ({
         onFocus={(_) => setShowPlaceholder(false)}
         onBlur={(_) => setShowPlaceholder(true)}
         placeholderTextColor={
-          placeholderTextColor ? placeholderTextColor : '#FFFFFF'
+          placeholderTextColor ? placeholderTextColor : "#FFFFFF"
         }
         placeholder={showPlaceholder ? placeholder : null}
         {...props}
@@ -49,7 +49,7 @@ const BaseTextInput = ({
           onPressIn={onPressInIcon}
           onPressOut={onPressOutIcon}
         >
-          <Icon resizeMode="contain" source={icon} />
+          <Icon tintColor="#4dabf5" resizeMode="contain" source={icon} />
         </Touchable>
       )}
     </InputWrapper>
@@ -71,7 +71,7 @@ const Touchable = styled.TouchableOpacity`
 const InputWrapper = styled.View`
   position: relative;
   text-align: center;
-  width: ${({ width }) => (width ? width : '100%')};
+  width: ${({ width }) => (width ? width : "100%")};
 `;
 const ErrorText = styled.Text`
   color: red;
@@ -94,15 +94,15 @@ const StyledInput = styled.TextInput`
   height: ${({ height }) => (height ? height : styled_h_normalize(55))};
   border: ${({ textError }) =>
     textError
-      ? '1px solid rgba(223, 33, 27, 0.7)'
-      : '1px solid rgba(23, 33, 43, 0.1)'};
-  border-radius: ${styled_h_normalize(20)};
+      ? "1px solid rgba(223, 33, 27, 0.7)"
+      : "1px solid rgba(23, 33, 43, 0.1)"};
+  border-radius: ${styled_h_normalize(10)};
   font-size: ${styled_h_normalize(16)};
   line-height: ${styled_h_normalize(18)};
   margin-bottom: ${styled_h_normalize(12)};
   margin-top: ${styled_h_normalize(12)};
-  color: ${({ color }) => (color ? color : 'white')};
+  color: ${({ color }) => (color ? color : "white")};
   padding: ${styled_t_r_b_l_normalize(10, 50, 10, 20)};
   background-color: ${({ backgroundColor }) =>
-    backgroundColor ? backgroundColor : 'rgba(255, 255, 255, 0.2)'};
+    backgroundColor ? backgroundColor : "rgba(255, 255, 255, 0.2)"};
 `;

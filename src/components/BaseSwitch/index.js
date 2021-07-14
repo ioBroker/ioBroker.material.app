@@ -1,19 +1,19 @@
 //Core
-import React from "react";
-import styled from "styled-components/native";
+import React from 'react';
+import styled from 'styled-components/native';
 import {
   styled_h_normalize,
   w_normalize,
-} from "../../services/helpers/normalizeSize";
+} from '../../services/helpers/normalizeSize';
 
 const BaseSwitch = (props) => {
-  const { value, textError, addTextOn = "", AddTextOff = "" } = props;
+  const { value, textError, addTextOn = '', AddTextOff = '' } = props;
   return (
     <SwitchWrapper>
       {textError && <ErrorText>{textError}</ErrorText>}
       <SwitchCustom
-        trackColor={{ false: "white", true: "#F8E71C" }}
-        thumbColor={!value ? "#F8E71C" : "white"}
+        trackColor={{ false: 'white', true: '#4dabf5' }}
+        thumbColor={!value ? '#4dabf5' : 'white'}
         ios_backgroundColor="white"
         style={{ transform: [{ scaleX: 1 }, { scaleY: 0.9 }] }}
         {...props}

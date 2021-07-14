@@ -7,7 +7,7 @@ import {
   w_normalize,
 } from '../../services/helpers/normalizeSize';
 import BaseButton from '../../components/BaseButton';
-import { resources } from '../../services/locales';
+// import { resources } from "../../services/locales";
 import { TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import wifi from '../../../assets/wifi.png';
@@ -32,32 +32,26 @@ const shadow = {
   elevation: 11,
 };
 
-const style = {
-  smallText: {
-    fontWeight: 'bold',
-    textShadowColor: 'rgba(44, 27, 147, 0.7)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 10,
-    fontSize: w_normalize(24),
-    color: 'silver',
-    opacity: 0.6,
-  },
-  bigText: {
-    fontWeight: 'bold',
-    textShadowColor: 'rgba(44, 27, 147, 0.7)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 10,
-    fontSize: w_normalize(48),
-    color: '#FFFFFF',
-  },
-  line: {
-    position: 'absolute',
-    borderBottomColor: '#580056',
-    borderBottomWidth: 1,
-    height: '50%',
-    width: '40%',
-  },
-};
+// const style = {
+//   smallText: {
+//     fontWeight: 'bold',
+//     fontSize: w_normalize(24),
+//     color: 'silver',
+//     opacity: 0.6,
+//   },
+//   bigText: {
+//     fontWeight: 'bold',
+//     fontSize: w_normalize(48),
+//     color: '#FFFFFF',
+//   },
+//   line: {
+//     position: 'absolute',
+//     borderBottomColor: '#4dabf5',
+//     borderBottomWidth: 1,
+//     height: '50%',
+//     width: '40%',
+//   },
+// };
 
 const Modal = ({ navigation, route: { params } }) => {
   useEffect(() => {
@@ -76,17 +70,50 @@ const Modal = ({ navigation, route: { params } }) => {
     })();
   }, []);
 
-  const { i18n, t } = useTranslation();
-  const arrLang = Object.keys(resources);
-  const arrLangIndexCurrent = arrLang.indexOf(i18n.language);
-  const arrLangIndexCurrentPrev =
-    arrLangIndexCurrent > 0 ? arrLangIndexCurrent - 1 : arrLang.length - 1;
-  const arrLangIndexCurrentNext =
-    arrLangIndexCurrent < arrLang.length - 1 ? arrLangIndexCurrent + 1 : 0;
+  const {
+    // i18n,
+    t,
+  } = useTranslation();
+  // const arrLang = Object.keys(resources);
+  // const arrLangIndexCurrent = arrLang.indexOf(i18n.language);
+  // const arrLangIndexCurrentPrev =
+  //   arrLangIndexCurrent > 0 ? arrLangIndexCurrent - 1 : arrLang.length - 1;
+  // const arrLangIndexCurrentNext =
+  //   arrLangIndexCurrent < arrLang.length - 1 ? arrLangIndexCurrent + 1 : 0;
 
   const { switchObj, emailObj, passwordObj, ssidObj, localObj } =
     useContext(ContextWrapperCreate);
   const [secure, setSecure] = useState(true);
+  const [switchValue, setSwitchValue] = useState(switchObj.switchValue);
+  const [emailValue, setEmailValue] = useState(emailObj.emailValue);
+  const [passwordValue, setPasswordValue] = useState(passwordObj.passwordValue);
+  const [ssidValue, setSsidValue] = useState(ssidObj.ssidValue);
+  const [localValue, setLocalValue] = useState(localObj.localValue);
+
+  const saveSettings = () => {
+    if (switchObj.switchValue !== switchValue) {
+      switchObj.setSwitchValue(switchValue);
+    }
+    if (emailObj.emailValue !== emailValue) {
+      emailObj.setEmailValue(emailValue);
+    }
+    if (passwordObj.passwordValue !== passwordValue) {
+      passwordObj.setPasswordValue(passwordValue);
+    }
+    if (ssidObj.ssidValue !== ssidValue) {
+      ssidObj.setSsidValue(ssidValue);
+    }
+    if (localObj.localValue !== localValue) {
+      localObj.setLocalValue(localValue);
+    }
+  };
+
+  const checkChanges =
+    switchObj.switchValue === switchValue &&
+    emailObj.emailValue === emailValue &&
+    passwordObj.passwordValue === passwordValue &&
+    ssidObj.ssidValue === ssidValue &&
+    localObj.localValue === localValue;
 
   return (
     <TouchableWithoutFeedback
@@ -96,7 +123,7 @@ const Modal = ({ navigation, route: { params } }) => {
       <Wrapper>
         <HeadWrapper style={shadow}>
           <Heading>{t('Settings')}</Heading>
-          <WrapperSlider>
+          {/* <WrapperSlider>
             <TouchableOpacity
               onPress={() => {
                 i18n.changeLanguage(arrLang[arrLangIndexCurrentPrev]);
@@ -118,31 +145,31 @@ const Modal = ({ navigation, route: { params } }) => {
             >
               <Triangel
                 style={{
-                  transform: [{ rotate: '90deg' }],
+                  transform: [{ rotate: "90deg" }],
                 }}
               />
             </TouchableOpacity>
-          </WrapperSlider>
+          </WrapperSlider> */}
           <WrapperTextInput>
             <BaseTextInput
-              onChangeText={localObj.setLocalValue}
-              value={localObj.localValue}
+              onChangeText={setLocalValue}
+              value={localValue}
               placeholder={t('Local URL')}
               topText
             />
             <BaseTextInput
-              onChangeText={ssidObj.setSsidValue}
-              value={ssidObj.ssidValue}
+              onChangeText={setSsidValue}
+              value={ssidValue}
               placeholder={t('Local SSID')}
               topText
               icon={wifi}
               onPressInIcon={() => {
                 WifiManager.getCurrentWifiSSID().then(
                   (ssid) => {
-                    ssidObj.setSsidValue(ssid);
+                    setSsidValue(ssid);
                   },
                   () => {
-                    ssidObj.setSsidValue('error');
+                    setSsidValue('error');
                   }
                 );
               }}
@@ -150,31 +177,29 @@ const Modal = ({ navigation, route: { params } }) => {
           </WrapperTextInput>
           <CermConditionsWrapper>
             <BaseSwitch
-              onValueChange={switchObj.setSwitchValue}
-              value={switchObj.switchValue}
+              onValueChange={setSwitchValue}
+              value={switchValue}
               addTextOn=""
               addTextOff=" "
             />
-            <TouchableOpacity
-              onPress={() => switchObj.setSwitchValue(!switchObj.switchValue)}
-            >
+            <TouchableOpacity onPress={() => setSwitchValue(!switchValue)}>
               <PreshTextCustom>
                 {t('Remote access via ioBroker.pro')}
               </PreshTextCustom>
             </TouchableOpacity>
           </CermConditionsWrapper>
 
-          {switchObj.switchValue && (
+          {switchValue && (
             <WrapperTextInput>
               <BaseTextInput
-                onChangeText={emailObj.setEmailValue}
-                value={emailObj.emailValue}
+                onChangeText={setEmailValue}
+                value={emailValue}
                 placeholder={t('Email')}
                 topText
               />
               <BaseTextInput
-                onChangeText={passwordObj.setPasswordValue}
-                value={passwordObj.passwordValue}
+                onChangeText={setPasswordValue}
+                value={passwordValue}
                 placeholder={t('Password')}
                 secureTextEntry={secure}
                 onPressInIcon={() => setSecure(false)}
@@ -186,18 +211,22 @@ const Modal = ({ navigation, route: { params } }) => {
           )}
           <ButtonWrapper>
             <BaseButton
-              onPress={() => navigation.goBack()}
+              onPress={() => {
+                saveSettings();
+                navigation.goBack();
+              }}
               width={w_normalize(120)}
-              backgroundColor="#F8E71C"
-              textColor="#444444"
+              backgroundColor="#4dabf5"
+              textColor="black"
+              disabled={checkChanges}
             >
               {t('Save')}
             </BaseButton>
             <BaseButton
               onPress={() => navigation.goBack()}
               width={w_normalize(120)}
-              backgroundColor="rgba(44, 27, 147, 0.2)"
-              textColor="white"
+              backgroundColor="#dfe0e0"
+              textColor="black"
             >
               {t('Close')}
             </BaseButton>
@@ -207,6 +236,8 @@ const Modal = ({ navigation, route: { params } }) => {
     </TouchableWithoutFeedback>
   );
 };
+//#4dabf5
+//#dfe0e0
 const CermConditionsWrapper = styled.View`
   flex-flow: row;
   align-items: center;
@@ -220,31 +251,32 @@ const PreshTextCustom = styled.Text`
 `;
 const HeadWrapper = styled.View`
   width: 100%;
-  background-color: #306bff;
+  background-color: #424242;
   border-radius: ${h_normalize(10)};
   justify-content: space-between;
   align-items: center;
 `;
-const WrapperSlider = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  width: ${w_normalize(200)};
-  align-items: center;
-`;
-const Triangel = styled.View`
-  width: 0;
-  height: 0;
-  background-color: transparent;
-  border-style: solid;
-  border-left-width: ${h_normalize(15)};
-  border-right-width: ${h_normalize(15)};
-  border-bottom-width: ${h_normalize(30)};
-  border-left-color: transparent;
-  border-right-color: transparent;
-  border-bottom-color: rgba(44, 27, 147, 0.6);
-  opacity: 0.8;
-  transform: rotate(-90deg);
-`;
+// const WrapperSlider = styled.View`
+//   flex-direction: row;
+//   justify-content: space-between;
+//   width: ${w_normalize(200)};
+//   margin-bottom: ${w_normalize(10)};
+//   align-items: center;
+// `;
+// const Triangel = styled.View`
+//   width: 0;
+//   height: 0;
+//   background-color: transparent;
+//   border-style: solid;
+//   border-left-width: ${h_normalize(15)};
+//   border-right-width: ${h_normalize(15)};
+//   border-bottom-width: ${h_normalize(30)};
+//   border-left-color: transparent;
+//   border-right-color: transparent;
+//   border-bottom-color: #4dabf5;
+//   opacity: 0.8;
+//   transform: rotate(-90deg);
+// `;
 
 const Wrapper = styled.View`
   flex: 1;
@@ -270,8 +302,8 @@ const ButtonWrapper = styled.View`
   height: ${h_normalize(100)};
 `;
 const Heading = styled(Text)`
-  margin-top: ${h_normalize(40)};
-  margin-bottom: ${h_normalize(10)};
+  margin-top: ${h_normalize(30)};
+  margin-bottom: ${h_normalize(30)};
   font-size: ${w_normalize(18)};
   padding: ${styled_t_r_b_l_normalize(0, 40, 0, 40)};
   color: white;
