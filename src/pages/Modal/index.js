@@ -19,6 +19,8 @@ import { Keyboard } from 'react-native';
 import { PermissionsAndroid } from 'react-native';
 import WifiManager from 'react-native-wifi-reborn';
 import { ContextWrapperCreate } from '../../components/ContextWrapper';
+import { Platform } from 'react-native';
+import { Dimensions } from 'react-native';
 
 const shadow = {
   shadowColor: '#000',
@@ -54,20 +56,31 @@ const shadow = {
 // };
 
 const Modal = ({ navigation, route: { params } }) => {
+  const [portrait, setPortrait] = useState(true);
+
   useEffect(() => {
-    (async () => {
-      PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: 'Location permission is required for WiFi connections',
-          message:
-            'This app needs location permission as this is required  ' +
-            'to scan for wifi networks.',
-          buttonNegative: 'DENY',
-          buttonPositive: 'ALLOW',
-        }
-      );
-    })();
+    if (Platform.OS !== 'ios') {
+      (async () => {
+        PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location permission is required for WiFi connections',
+            message:
+              'This app needs location permission as this is required  ' +
+              'to scan for wifi networks.',
+            buttonNegative: 'DENY',
+            buttonPositive: 'ALLOW',
+          }
+        );
+      })();
+    }
+    const isPortrait = () => {
+      const dim = Dimensions.get("screen");
+      return dim.height >= dim.width;
+    };
+    Dimensions.addEventListener('change', () => {
+      setPortrait(!!isPortrait());
+    });
   }, []);
 
   const {
@@ -121,7 +134,7 @@ const Modal = ({ navigation, route: { params } }) => {
       onPress={Keyboard.dismiss}
     >
       <Wrapper>
-        <HeadWrapper style={shadow}>
+        <HeadWrapper style={{ ...shadow, flex: portrait ? 0 : 1 }}>
           <Heading>{t('Settings')}</Heading>
           {/* <WrapperSlider>
             <TouchableOpacity
@@ -150,65 +163,67 @@ const Modal = ({ navigation, route: { params } }) => {
               />
             </TouchableOpacity>
           </WrapperSlider> */}
-          <WrapperTextInput>
-            <BaseTextInput
-              onChangeText={setLocalValue}
-              value={localValue}
-              placeholder={t('Local URL')}
-              topText
-            />
-            <BaseTextInput
-              onChangeText={setSsidValue}
-              value={ssidValue}
-              placeholder={t('Local SSID')}
-              topText
-              icon={wifi}
-              onPressInIcon={() => {
-                WifiManager.getCurrentWifiSSID().then(
-                  (ssid) => {
-                    setSsidValue(ssid);
-                  },
-                  () => {
-                    setSsidValue('error');
-                  }
-                );
-              }}
-            />
-          </WrapperTextInput>
-          <CermConditionsWrapper>
-            <BaseSwitch
-              onValueChange={setSwitchValue}
-              value={switchValue}
-              addTextOn=""
-              addTextOff=" "
-            />
-            <TouchableOpacity onPress={() => setSwitchValue(!switchValue)}>
-              <PreshTextCustom>
-                {t('Remote access via ioBroker.pro')}
-              </PreshTextCustom>
-            </TouchableOpacity>
-          </CermConditionsWrapper>
-
-          {switchValue && (
+          <WrapperSettingsScroll>
             <WrapperTextInput>
               <BaseTextInput
-                onChangeText={setEmailValue}
-                value={emailValue}
-                placeholder={t('Email')}
+                onChangeText={setLocalValue}
+                value={localValue}
+                placeholder={t('Local URL')}
                 topText
               />
               <BaseTextInput
-                onChangeText={setPasswordValue}
-                value={passwordValue}
-                placeholder={t('Password')}
-                secureTextEntry={secure}
-                onPressInIcon={() => setSecure(false)}
-                onPressOutIcon={() => setSecure(true)}
-                icon={see}
+                onChangeText={setSsidValue}
+                value={ssidValue}
+                placeholder={t('Local SSID')}
                 topText
+                icon={wifi}
+                onPressInIcon={() => {
+                  WifiManager.getCurrentWifiSSID().then(
+                    (ssid) => {
+                      setSsidValue(ssid);
+                    },
+                    () => {
+                      setSsidValue('error');
+                    }
+                  );
+                }}
               />
             </WrapperTextInput>
-          )}
+            <CermConditionsWrapper>
+              <BaseSwitch
+                onValueChange={setSwitchValue}
+                value={switchValue}
+                addTextOn=""
+                addTextOff=" "
+              />
+              <TouchableOpacity onPress={() => setSwitchValue(!switchValue)}>
+                <PreshTextCustom>
+                  {t('Remote access via ioBroker.pro')}
+                </PreshTextCustom>
+              </TouchableOpacity>
+            </CermConditionsWrapper>
+
+            {switchValue && (
+              <WrapperTextInput>
+                <BaseTextInput
+                  onChangeText={setEmailValue}
+                  value={emailValue}
+                  placeholder={t('Email')}
+                  topText
+                />
+                <BaseTextInput
+                  onChangeText={setPasswordValue}
+                  value={passwordValue}
+                  placeholder={t('Password')}
+                  secureTextEntry={secure}
+                  onPressInIcon={() => setSecure(false)}
+                  onPressOutIcon={() => setSecure(true)}
+                  icon={see}
+                  topText
+                />
+              </WrapperTextInput>
+            )}
+          </WrapperSettingsScroll>
           <ButtonWrapper>
             <BaseButton
               onPress={() => {
@@ -241,7 +256,8 @@ const Modal = ({ navigation, route: { params } }) => {
 const CermConditionsWrapper = styled.View`
   flex-flow: row;
   align-items: center;
-  margin: ${styled_t_r_b_l_normalize(12, 0, 0, 0)};
+  flex-wrap: wrap;
+  margin: ${styled_t_r_b_l_normalize(12, 0, 0, 12)};
 `;
 const PreshTextCustom = styled.Text`
   color: white;
@@ -251,6 +267,8 @@ const PreshTextCustom = styled.Text`
 `;
 const HeadWrapper = styled.View`
   width: 100%;
+  /* flex: 1; */
+  height: auto;
   background-color: #424242;
   border-radius: ${h_normalize(10)};
   justify-content: space-between;
@@ -278,6 +296,11 @@ const HeadWrapper = styled.View`
 //   transform: rotate(-90deg);
 // `;
 
+const WrapperSettingsScroll = styled.ScrollView`
+  /* flex: 1; */
+  /* flex-grow: 1; */
+  width: 100%;
+`;
 const Wrapper = styled.View`
   flex: 1;
   justify-content: center;
@@ -290,7 +313,7 @@ const WrapperTextInput = styled.View`
   width: 100%;
   align-items: center;
   justify-content: space-between;
-  padding: ${styled_t_r_b_l_normalize(0, 20, 0, 20)};
+  padding: ${styled_t_r_b_l_normalize(20, 20, 0, 20)};
 `;
 const ButtonWrapper = styled.View`
   width: 100%;
@@ -303,9 +326,9 @@ const ButtonWrapper = styled.View`
 `;
 const Heading = styled(Text)`
   margin-top: ${h_normalize(30)};
-  margin-bottom: ${h_normalize(30)};
+  /* margin-bottom: ${h_normalize(30)}; */
   font-size: ${w_normalize(18)};
-  padding: ${styled_t_r_b_l_normalize(0, 40, 0, 40)};
+  padding: ${styled_t_r_b_l_normalize(0, 40, 30, 40)};
   color: white;
   font-weight: 300;
   text-align: center;

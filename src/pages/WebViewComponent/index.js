@@ -4,17 +4,17 @@ import React, {
   useState,
   useEffect,
   useCallback,
-} from 'react';
-import { WebView } from 'react-native-webview';
-import styled from 'styled-components';
-import WifiManager from 'react-native-wifi-reborn';
+} from "react";
+import { WebView } from "react-native-webview";
+import styled from "styled-components";
+import WifiManager from "react-native-wifi-reborn";
 
-import { ContextWrapperCreate } from '../../components/ContextWrapper';
-import MyTabBar from '../../components/MyTabBar';
-import { Alert } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import { ScrollView } from 'react-native';
-import { RefreshControl } from 'react-native';
+import { ContextWrapperCreate } from "../../components/ContextWrapper";
+import MyTabBar from "../../components/MyTabBar";
+import { Alert } from "react-native";
+import { useTranslation } from "react-i18next";
+import { ScrollView } from "react-native";
+import { RefreshControl } from "react-native";
 
 const WebViewComponent = ({ navigation }) => {
   const { switchObj, emailObj, passwordObj, ssidObj, localObj } =
@@ -45,61 +45,65 @@ const WebViewComponent = ({ navigation }) => {
     setTimeout(() => setRefreshing(false), 1500);
   }, []);
   return (
-    <WrapperWebView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-      contentContainerStyle={{ flex: 1 }}
-    >
-      <WebViewContent
-        ref={refWebView}
-        startInLoadingState
-        onError={(err) => {
-          Alert.alert(t('Error'), t('Redirect to iobroker.pro?'), [
-            {
-              text: t("No"),
-              style: 'cancel',
-            },
-            {
-              text: t('Yes'),
-              onPress: () => {
-                const newURL = 'https://iobroker.pro';
-                const redirectTo = `window.location = "${newURL}"`;
-                refWebView.current?.injectJavaScript(redirectTo);
-              },
-            },
-          ]);
-        }}
-        renderLoading={() => {
-          setRefreshing(true);
-        }}
-        onLoadEnd={() => {
-          setRefreshing(false);
-        }}
-        onNavigationStateChange={(newNavState) => {
-          const { url } = newNavState;
-          if (!url) {
-            return;
-          }
-          if (url.includes('login?app=true')) {
-            const newURL = 'https://iobroker.pro/material/index.html?app=true';
-            const redirectTo = `window.location = "${newURL}"`;
-            refWebView.current?.injectJavaScript(redirectTo);
-          }
-        }}
-        source={
-          !useLocal
-            ? {
-                uri: 'https://iobroker.pro/login?app=true',
-                method: 'POST',
-                body: `username=${emailObj.emailValue}&password=${passwordObj.passwordValue}`,
-              }
-            : { uri: localObj.localValue }
+    <>
+      <WrapperWebView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        on
-      />
+        contentContainerStyle={{ flex: 1 }}
+      >
+        <WebViewContent
+          ref={refWebView}
+          startInLoadingState
+          onError={(err) => {
+            Alert.alert(t("Error"), t("Redirect to iobroker.pro?"), [
+              {
+                text: t('No'),
+                style: "cancel",
+              },
+              {
+                text: t("Yes"),
+                onPress: () => {
+                  const newURL = "https://iobroker.pro";
+                  const redirectTo = `window.location = "${newURL}"`;
+                  refWebView.current?.injectJavaScript(redirectTo);
+                },
+              },
+            ]);
+          }}
+          renderLoading={() => {
+            setRefreshing(true);
+          }}
+          onLoadEnd={() => {
+            setRefreshing(false);
+          }}
+          onNavigationStateChange={(newNavState) => {
+            const { url } = newNavState;
+            if (!url) {
+              return;
+            }
+            if (url.includes("login?app=true")) {
+              const newURL =
+                "https://iobroker.pro/material/index.html?app=true";
+              const redirectTo = `window.location = "${newURL}"`;
+              refWebView.current?.injectJavaScript(redirectTo);
+            }
+          }}
+          source={
+            !useLocal
+              ? {
+                  uri: "https://iobroker.pro/login?app=true",
+                  method: "POST",
+                  body: `username=${emailObj.emailValue}&password=${passwordObj.passwordValue}`,
+                }
+              : { uri: localObj.localValue }
+          }
+          on
+        />
+      </WrapperWebView>
+
       <MyTabBar navigation={navigation} />
-    </WrapperWebView>
+    </>
   );
 };
 

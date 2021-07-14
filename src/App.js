@@ -6,21 +6,29 @@ import styled from "styled-components";
 import background from "../assets/background.png";
 import { ImageBackground } from "react-native";
 import { ContextWrapper } from "./components/ContextWrapper";
+import { Platform } from "react-native";
+import { SafeAreaView } from "react-native";
 
 const App = () => {
   return (
     <WrapperApp>
-      <StatusBar hidden />
+      <StatusBar hidden={Platform.OS !== "ios" ? true : false} />
       <BackgroundWrapper resizeMode="cover" source={background}>
-        <ContextWrapper>
-          <AppNavigation />
-        </ContextWrapper>
+        <WrapperContent>
+          <ContextWrapper>
+            <AppNavigation />
+          </ContextWrapper>
+        </WrapperContent>
       </BackgroundWrapper>
     </WrapperApp>
   );
 };
 
 const WrapperApp = styled(View)`
+  flex: 1;
+  flex-grow: 1;
+`;
+const WrapperContent = styled(SafeAreaView)`
   flex: 1;
   flex-grow: 1;
 `;
