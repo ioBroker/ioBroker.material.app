@@ -8,6 +8,7 @@ import React, {
 import { WebView } from "react-native-webview";
 import styled from "styled-components";
 // import WifiManager from "react-native-wifi-reborn";
+import Geolocation from "@react-native-community/geolocation";
 
 import { ContextWrapperCreate } from "../../components/ContextWrapper";
 import MyTabBar from "../../components/MyTabBar";
@@ -16,7 +17,24 @@ import { useTranslation } from "react-i18next";
 import { ScrollView } from "react-native";
 import { RefreshControl } from "react-native";
 import { useNetInfo } from '@react-native-community/netinfo';
-import { Text } from "react-native";
+import { useSwipe } from "../../services/hooks/useSwipe";
+import { Platform } from "react-native";
+import {
+  h_normalize,
+  styled_t_r_b_l_normalize,
+  w_normalize,
+} from "../../services/helpers/normalizeSize";
+import BackgroundTask from 'react-native-background-task';
+import BaseButton from "../../components/BaseButton";
+import { View } from "react-native";
+import refresIcon from "../../../assets/refresh.png";
+
+BackgroundTask.define(() => {
+  // Geolocation.getCurrentPosition((info) => console.log(info));
+  console.log('Hello from a background task');
+
+  BackgroundTask.finish();
+});
 
 function buildLocalUrl(url) {
   // check if material, admin, vis, echarts
@@ -96,18 +114,104 @@ const WebViewComponent = ({ navigation }) => {
     setUseLocal(false);
   }
 
+  useEffect(() => {
+    if (showSettings) {
+      setTimeout(() => setShowSettings(false), 10000);
+    }
+  }, [showSettings]);
+
+  const { onTouchStart, onTouchEnd } = useSwipe(onSwipeLeft, onSwipeRight, 2);
+
+  function onSwipeLeft() {
+    if (!showSettings) {
+      setShowSettings(true);
+    } else {
+      navigation.navigate('Modal');
+    }
+  }
+
+  function onSwipeRight() {
+    if (showSettings) {
+      setShowSettings(false);
+    }
+  }
+
+  // const [enablePTR, setEnablePTR] = useState(false);
+
+  useEffect(() => {
+    Geolocation.watchPosition((e) => {
+      console.log(12233, e);
+    });
+    return () => {
+      Geolocation.stopObserving();
+    };
+  }, []);
+  useEffect(() => {
+    BackgroundTask.schedule({
+      period: 900,
+    });
+    BackgroundTask.statusAsync().then((e) => console.log(e));
+  }, []);
   return (
     <>
       <WrapperWebView
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl
+            enabled={Platform.OS === "ios" ? true : false}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
         }
+        // scrollEnabled={false}
         contentContainerStyle={{ flex: 1 }}
       >
         {!warning ? (
           <WebViewContent
             ref={refWebView}
             startInLoadingState
+            //           injectedJavaScript={`
+            //   (function() {
+            //     window.onscroll=function(){window.postMessage(document.documentElement.scrollTop||document.body.scrollTop)}
+            //     function wrap(fn) {
+            //       return function wrapper() {
+            //         var res = fn.apply(this, arguments);
+            //         window.ReactNativeWebView.postMessage('navigationStateChange');
+            //         return res;
+            //       }
+            //     }
+
+            //     history.pushState = wrap(history.pushState);
+            //     history.replaceState = wrap(history.replaceState);
+            //     window.addEventListener('popstate', function() {
+            //       window.ReactNativeWebView.postMessage('navigationStateChange');
+            //     });
+            //   })();
+
+            //   true;
+            // `}
+            // onMessage={({ nativeEvent: state }) => {
+            //   console.log(11223344, state.data);
+            //   if (state.data === "navigationStateChange") {
+            //     // Navigation state updated, can check state.canGoBack, etc.
+            //     const url = state.url;
+            //     if (
+            //       (showSettings && url.includes("/chart/")) ||
+            //       url.includes("/dialog/")
+            //     ) {
+            //       setShowSettings(false);
+            //     } else if (!showSettings) {
+            //       setShowSettings(true);
+            //     }
+            //   } else {
+            //     // if (state.data == 0 && !enablePTR) {
+            //     //   setEnablePTR(true);
+            //     // } else if (state.data > 10 && enablePTR) {
+            //     //   setEnablePTR(false);
+            //     // }
+            //   }
+            // }}
             onError={(err) => {
               Alert.alert(t("Error"), t("Redirect to iobroker.pro?"), [
                 {
@@ -123,23 +227,6 @@ const WebViewComponent = ({ navigation }) => {
                   },
                 },
               ]);
-            }}
-            onWebMessage={(e) => {
-              const data = e.nativeEvent.data;
-              if (data && data.includes('locationUpdated')) {
-                let newLoc = JSON.parse(data);
-                let url = newLoc.locationUpdated;
-                //handle the new URL or change anything needed on URL change
-                console.log(111121, refWebView.current, url);
-                if (
-                  (showSettings && url.includes("/chart/")) ||
-                  url.includes("/dialog/")
-                ) {
-                  setShowSettings(false);
-                } else if (!showSettings) {
-                  setShowSettings(true);
-                }
-              }
             }}
             renderLoading={() => {
               setRefreshing(true);
@@ -159,6 +246,26 @@ const WebViewComponent = ({ navigation }) => {
                 const redirectTo = `window.location = "${newURL}"`;
                 refWebView.current?.injectJavaScript(redirectTo);
               }
+              /*refWebView.current?.injectJavaScript(`
+              (function() {
+                window.onscroll=function(){window.postMessage(document.documentElement.scrollTop||document.body.scrollTop)}
+                function wrap(fn) {
+                  return function wrapper() {
+                    var res = fn.apply(this, arguments);
+                    window.ReactNativeWebView.postMessage('navigationStateChange');
+                    return res;
+                  }
+                }
+
+                history.pushState = wrap(history.pushState);
+                history.replaceState = wrap(history.replaceState);
+                window.addEventListener('popstate', function() {
+                  window.ReactNativeWebView.postMessage('navigationStateChange');
+                });
+              })();
+
+              true;
+            `);*/
             }}
             source={
               !useLocal
@@ -174,15 +281,54 @@ const WebViewComponent = ({ navigation }) => {
             on
           />
         ) : (
-          <Text>{warning}</Text>
+          <WrapperText>
+            <TextCustom>{warning}</TextCustom>
+          </WrapperText>
         )}
       </WrapperWebView>
 
       {showSettings ? <MyTabBar navigation={navigation} /> : null}
+      {Platform.os !== 'ios' && showSettings ? (
+        <WrapperTabBar>
+          <BaseButton
+            onPress={() => onRefresh()}
+            width={w_normalize(55)}
+            height={w_normalize(55)}
+            padding
+            backgroundColor="rgba(77, 171, 245, 0.3)"
+            textColor="white"
+            minRadius
+            circle
+            icon={refresIcon}
+          />
+        </WrapperTabBar>
+      ) : null}
     </>
   );
 };
 
+const WrapperTabBar = styled(View)`
+  flex: 1;
+  height: auto;
+  width: ${h_normalize(90)};
+  justify-content: center;
+  align-items: center;
+  right: ${h_normalize(-5)};
+  bottom: ${h_normalize(85)};
+  position: absolute;
+`;
+const WrapperText = styled.View`
+  flex: 1;
+  justify-content: center;
+`;
+const TextCustom = styled.Text`
+  color: white;
+  font-weight: bold;
+  align-items: center;
+  text-align: center;
+  margin: ${styled_t_r_b_l_normalize(0, 20, 15, 20)};
+  font-size: ${h_normalize(16)};
+`;
 const WrapperWebView = styled(ScrollView)`
   flex: 1;
   flex-grow: 1;

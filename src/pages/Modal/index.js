@@ -1,30 +1,32 @@
-import { Text } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
-import styled from "styled-components";
+import { Text } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import {
   h_normalize,
   styled_t_r_b_l_normalize,
   w_normalize,
-} from "../../services/helpers/normalizeSize";
-import BaseButton from "../../components/BaseButton";
+} from '../../services/helpers/normalizeSize';
+import BaseButton from '../../components/BaseButton';
 // import { resources } from "../../services/locales";
-import { TouchableOpacity } from "react-native";
-import { useTranslation } from "react-i18next";
-import wifi from "../../../assets/wifi.png";
-import see from "../../../assets/see.png";
-import BaseTextInput from "../../components/BaseTextInput";
-import BaseSwitch from "../../components/BaseSwitch";
-import { TouchableWithoutFeedback } from "react-native";
-import { Keyboard } from "react-native";
-import { PermissionsAndroid } from "react-native";
+import { TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import wifi from '../../../assets/wifi.png';
+import see from '../../../assets/see.png';
+import BaseTextInput from '../../components/BaseTextInput';
+import BaseSwitch from '../../components/BaseSwitch';
+import { TouchableWithoutFeedback } from 'react-native';
+import { Keyboard } from 'react-native';
+import { PermissionsAndroid } from 'react-native';
 // import WifiManager from "react-native-wifi-reborn";
-import { ContextWrapperCreate } from "../../components/ContextWrapper";
-import { Platform } from "react-native";
-import { Dimensions } from "react-native";
-import { useNetInfo } from "@react-native-community/netinfo";
+import { ContextWrapperCreate } from '../../components/ContextWrapper';
+import { Platform } from 'react-native';
+import { Dimensions } from 'react-native';
+import { useNetInfo } from '@react-native-community/netinfo';
+import { PERMISSIONS, request } from 'react-native-permissions';
+import { Alert } from 'react-native';
 
 const shadow = {
-  shadowColor: "#000",
+  shadowColor: '#000',
   shadowOffset: {
     width: 5,
     height: 5,
@@ -62,26 +64,26 @@ const Modal = ({ navigation, route: { params } }) => {
   const netInfo = useNetInfo();
 
   useEffect(() => {
-    if (Platform.OS !== "ios") {
+    if (Platform.OS !== 'ios') {
       (async () => {
         PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
-            title: "Location permission is required for WiFi connections",
+            title: 'Location permission is required for WiFi connections',
             message:
-              "This app needs location permission as this is required  " +
-              "to scan for wifi networks.",
-            buttonNegative: "DENY",
-            buttonPositive: "ALLOW",
+              'This app needs location permission as this is required  ' +
+              'to scan for wifi networks.',
+            buttonNegative: 'DENY',
+            buttonPositive: 'ALLOW',
           }
         );
       })();
     }
     const isPortrait = () => {
-      const dim = Dimensions.get('screen');
+      const dim = Dimensions.get("screen");
       return dim.height >= dim.width;
     };
-    Dimensions.addEventListener("change", () => {
+    Dimensions.addEventListener('change', () => {
       setPortrait(!!isPortrait());
     });
   }, []);
@@ -105,6 +107,10 @@ const Modal = ({ navigation, route: { params } }) => {
   const [passwordValue, setPasswordValue] = useState(passwordObj.passwordValue);
   const [ssidValue, setSsidValue] = useState(ssidObj.ssidValue);
   const [localValue, setLocalValue] = useState(localObj.localValue);
+  const [gpsValue, setGpshValue] = useState(false);
+  const [instanceValue, setInstancehValue] = useState(
+    'material.0.app.kids.battery'
+  );
 
   const saveSettings = () => {
     if (switchObj.switchValue !== switchValue) {
@@ -138,7 +144,10 @@ const Modal = ({ navigation, route: { params } }) => {
     >
       <Wrapper>
         <HeadWrapper style={{ ...shadow, flex: portrait ? 0 : 1 }}>
-          <Heading>{t("Settings")}</Heading>
+          <Heading>{t('Settings')}</Heading>
+          <TextCustom>
+            {t("you can slide right to left to show settings button")}
+          </TextCustom>
           {/* <WrapperSlider>
             <TouchableOpacity
               onPress={() => {
@@ -171,13 +180,13 @@ const Modal = ({ navigation, route: { params } }) => {
               <BaseTextInput
                 onChangeText={setLocalValue}
                 value={localValue}
-                placeholder={t("Local URL")}
+                placeholder={t('Local URL')}
                 topText
               />
               <BaseTextInput
                 onChangeText={setSsidValue}
                 value={ssidValue}
-                placeholder={t("Local SSID")}
+                placeholder={t('Local SSID')}
                 topText
                 icon={wifi}
                 onPressInIcon={() => {
@@ -189,11 +198,22 @@ const Modal = ({ navigation, route: { params } }) => {
                   //     setSsidValue('error');
                   //   }
                   // );
-                  if (netInfo?.details?.ssid) {
-                    setSsidValue(netInfo.details.ssid);
-                  } else {
-                    setSsidValue("error");
-                  }
+                  request(
+                    Platform.select({
+                      android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+                      ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+                    })
+                  ).then((res) => {
+                    if (res === "granted") {
+                      if (netInfo?.details?.ssid) {
+                        setSsidValue(netInfo.details.ssid);
+                      } else {
+                        setSsidValue('error');
+                      }
+                    } else {
+                      Alert.alert(t("Location is not enabled"));
+                    }
+                  });
                 }}
               />
             </WrapperTextInput>
@@ -205,8 +225,8 @@ const Modal = ({ navigation, route: { params } }) => {
                 addTextOff=" "
               />
               <TouchableOpacity onPress={() => setSwitchValue(!switchValue)}>
-                <PreshTextCustom>
-                  {t("Remote access via ioBroker.pro")}
+                <PreshTextCustom bool={switchValue}>
+                  {t('Remote access via ioBroker.pro')}
                 </PreshTextCustom>
               </TouchableOpacity>
             </CermConditionsWrapper>
@@ -216,13 +236,13 @@ const Modal = ({ navigation, route: { params } }) => {
                 <BaseTextInput
                   onChangeText={setEmailValue}
                   value={emailValue}
-                  placeholder={t("Email")}
+                  placeholder={t('Email')}
                   topText
                 />
                 <BaseTextInput
                   onChangeText={setPasswordValue}
                   value={passwordValue}
-                  placeholder={t("Password")}
+                  placeholder={t('Password')}
                   secureTextEntry={secure}
                   onPressInIcon={() => setSecure(false)}
                   onPressOutIcon={() => setSecure(true)}
@@ -231,6 +251,27 @@ const Modal = ({ navigation, route: { params } }) => {
                 />
               </WrapperTextInput>
             )}
+            <CermConditionsWrapper>
+              <BaseSwitch
+                onValueChange={setGpshValue}
+                value={gpsValue}
+                addTextOn=""
+                addTextOff=" "
+              />
+              <TouchableOpacity onPress={() => setGpshValue(!gpsValue)}>
+                <PreshTextCustom bool={gpsValue}>
+                  {t('send GPS and battery to ioBroker')}
+                </PreshTextCustom>
+              </TouchableOpacity>
+            </CermConditionsWrapper>
+            <WrapperTextInput>
+              <BaseTextInput
+                onChangeText={setInstancehValue}
+                value={instanceValue}
+                placeholder={t('Instance')}
+                topText
+              />
+            </WrapperTextInput>
           </WrapperSettingsScroll>
           <ButtonWrapper>
             <BaseButton
@@ -243,7 +284,7 @@ const Modal = ({ navigation, route: { params } }) => {
               textColor="black"
               disabled={checkChanges}
             >
-              {t("Save")}
+              {t('Save')}
             </BaseButton>
             <BaseButton
               onPress={() => navigation.goBack()}
@@ -251,7 +292,7 @@ const Modal = ({ navigation, route: { params } }) => {
               backgroundColor="#dfe0e0"
               textColor="black"
             >
-              {t("Close")}
+              {t('Close')}
             </BaseButton>
           </ButtonWrapper>
         </HeadWrapper>
@@ -268,8 +309,14 @@ const CermConditionsWrapper = styled.View`
   margin: ${styled_t_r_b_l_normalize(12, 0, 0, 12)};
 `;
 const PreshTextCustom = styled.Text`
-  color: white;
+  color: ${({ bool }) => (bool ? 'white' : 'silver')};
   font-weight: bold;
+  margin: ${styled_t_r_b_l_normalize(0, 20, 15, 20)};
+  font-size: ${h_normalize(16)};
+`;
+const TextCustom = styled.Text`
+  color: silver;
+  font-weight: 300;
   margin: ${styled_t_r_b_l_normalize(0, 20, 15, 20)};
   font-size: ${h_normalize(16)};
 `;
