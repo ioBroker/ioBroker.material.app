@@ -156,7 +156,7 @@ android {
         release {
             storeFile file('ioBroker.vis.keystore')
             storePassword 'xxx'
-            keyAlias 'androidreleasekey'
+            keyAlias 'ioBroker.vis'
             keyPassword 'xxx'
         }
     }
