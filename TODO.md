@@ -19,5 +19,8 @@ settings https://www.flaticon.com/free-icon/settings_2099174?term=settings&page=
 refresh https://www.flaticon.com/free-icon/refresh-page-option_25429?term=refresh&page=1&position=10&page=1&position=10&related_id=25429&origin=search
 
 ## How to build android app
-cd android
-./gradlew bundleRelease  
+0. Call: npx jetify
+1. Place ioBroker.vis.keystore into android/app
+2. Write password in android/app/build.gradle on the line 158
+3. cd android
+4. gradlew bundleRelease  

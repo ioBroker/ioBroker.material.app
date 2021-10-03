@@ -27,7 +27,7 @@ import {
 import BackgroundTask from 'react-native-background-task';
 import BaseButton from "../../components/BaseButton";
 import { View } from "react-native";
-import refresIcon from "../../../assets/refresh.png";
+import refreshIcon from "../../../assets/refresh.png";
 
 BackgroundTask.define(() => {
   // Geolocation.getCurrentPosition((info) => console.log(info));
@@ -38,12 +38,12 @@ BackgroundTask.define(() => {
 
 function buildLocalUrl(url) {
   // check if material, admin, vis, echarts
-  if (url.includes(":3000") || url.includes("/material")) {
+  if (url.includes(':3000') || url.includes('/material')) {
     return url;
-  } else if (url.endsWith("/")) {
-    return url + "material/";
+  } else if (url.endsWith('/')) {
+    return url + 'material/';
   } else {
-    return url + "/material/";
+    return url + '/material/';
   }
 }
 
@@ -72,7 +72,7 @@ const WebViewComponent = ({ navigation }) => {
       passwordObj.passwordValue
     ) {
       if (
-        netInfo?.type === "wifi" &&
+        netInfo?.type === 'wifi' &&
         netInfo?.details?.ssid === ssidObj.ssidValue
       ) {
         setUseLocal(true);
@@ -108,7 +108,7 @@ const WebViewComponent = ({ navigation }) => {
   ) {
     // Show text. No local URL found
     warning = t(
-      "iobroker.pro settings or local url not found! Please set it settings."
+      'iobroker.pro settings or local url not found! Please set it settings.'
     );
   } else if (useLocal && !localObj.localValue) {
     setUseLocal(false);
@@ -159,7 +159,7 @@ const WebViewComponent = ({ navigation }) => {
         onTouchEnd={onTouchEnd}
         refreshControl={
           <RefreshControl
-            enabled={Platform.OS === "ios" ? true : false}
+            enabled={Platform.OS === 'ios'}
             refreshing={refreshing}
             onRefresh={onRefresh}
           />
@@ -213,15 +213,15 @@ const WebViewComponent = ({ navigation }) => {
             //   }
             // }}
             onError={(err) => {
-              Alert.alert(t("Error"), t("Redirect to iobroker.pro?"), [
+              Alert.alert(t('Error'), t('Redirect to iobroker.pro?'), [
                 {
                   text: t('No'),
-                  style: "cancel",
+                  style: 'cancel',
                 },
                 {
-                  text: t("Yes"),
+                  text: t('Yes'),
                   onPress: () => {
-                    const newURL = "https://iobroker.pro";
+                    const newURL = 'https://iobroker.pro';
                     const redirectTo = `window.location = "${newURL}"`;
                     refWebView.current?.injectJavaScript(redirectTo);
                   },
@@ -240,9 +240,8 @@ const WebViewComponent = ({ navigation }) => {
                 return;
               }
 
-              if (url.includes("login?app=true")) {
-                const newURL =
-                  "https://iobroker.pro/material/index.html?app=true";
+              if (url.includes('login?app=true')) {
+                const newURL = 'https://iobroker.pro/material/index.html?app=true';
                 const redirectTo = `window.location = "${newURL}"`;
                 refWebView.current?.injectJavaScript(redirectTo);
               }
@@ -270,8 +269,8 @@ const WebViewComponent = ({ navigation }) => {
             source={
               !useLocal
                 ? {
-                    uri: "https://iobroker.pro/login?app=true",
-                    method: "POST",
+                    uri: 'https://iobroker.pro/login?app=true',
+                    method: 'POST',
                     body: `username=${emailObj.emailValue}&password=${passwordObj.passwordValue}`,
                   }
                 : {
@@ -299,7 +298,7 @@ const WebViewComponent = ({ navigation }) => {
             textColor="white"
             minRadius
             circle
-            icon={refresIcon}
+            icon={refreshIcon}
           />
         </WrapperTabBar>
       ) : null}
