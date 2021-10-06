@@ -154,10 +154,10 @@ android {
             keyPassword 'android'
         }
         release {
-            storeFile file('ioBroker.vis.keystore')
-            storePassword 'xxx'
-            keyAlias 'ioBroker.vis'
-            keyPassword 'xxx'
+            storeFile file('ioBroker.material.keystore')
+            storePassword 'XXX'
+            keyAlias 'ioBroker.material'
+            keyPassword 'XXX'
         }
     }
     buildTypes {
