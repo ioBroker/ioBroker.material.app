@@ -80,10 +80,10 @@ const Modal = ({ navigation, route: { params } }) => {
       })();
     }
     const isPortrait = () => {
-      const dim = Dimensions.get("screen");
+      const dim = Dimensions.get('screen');
       return dim.height >= dim.width;
     };
-    Dimensions.addEventListener('change', () => {
+    Dimensions.addEventListener("change", () => {
       setPortrait(!!isPortrait());
     });
   }, []);
@@ -175,7 +175,7 @@ const Modal = ({ navigation, route: { params } }) => {
               />
             </TouchableOpacity>
           </WrapperSlider> */}
-          <WrapperSettingsScroll>
+          <WrapperSettingsScroll bool={portrait}>
             <WrapperTextInput>
               <BaseTextInput
                 onChangeText={setLocalValue}
@@ -354,6 +354,7 @@ const HeadWrapper = styled.View`
 const WrapperSettingsScroll = styled.ScrollView`
   /* flex: 1; */
   /* flex-grow: 1; */
+  height: ${(bool) => (bool ? h_normalize(400) : undefined)};
   width: 100%;
 `;
 const Wrapper = styled.View`
