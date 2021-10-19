@@ -8,7 +8,7 @@ import React, {
 import { WebView } from "react-native-webview";
 import styled from "styled-components";
 // import WifiManager from "react-native-wifi-reborn";
-import Geolocation from "@react-native-community/geolocation";
+// import Geolocation from "@react-native-community/geolocation";
 
 import { ContextWrapperCreate } from "../../components/ContextWrapper";
 import MyTabBar from "../../components/MyTabBar";
@@ -24,17 +24,17 @@ import {
   styled_t_r_b_l_normalize,
   w_normalize,
 } from "../../services/helpers/normalizeSize";
-import BackgroundTask from 'react-native-background-task';
+// import BackgroundTask from 'react-native-background-task';
 import BaseButton from "../../components/BaseButton";
 import { View } from "react-native";
 import refreshIcon from "../../../assets/refresh.png";
 
-BackgroundTask.define(() => {
-  // Geolocation.getCurrentPosition((info) => console.log(info));
-  console.log('Hello from a background task');
+// BackgroundTask.define(() => {
+//   // Geolocation.getCurrentPosition((info) => console.log(info));
+//   console.log('Hello from a background task');
 
-  BackgroundTask.finish();
-});
+//   BackgroundTask.finish();
+// });
 
 function buildLocalUrl(url) {
   // check if material, admin, vis, echarts
@@ -138,20 +138,20 @@ const WebViewComponent = ({ navigation }) => {
 
   // const [enablePTR, setEnablePTR] = useState(false);
 
-  useEffect(() => {
-    Geolocation.watchPosition((e) => {
-      console.log(12233, e);
-    });
-    return () => {
-      Geolocation.stopObserving();
-    };
-  }, []);
-  useEffect(() => {
-    BackgroundTask.schedule({
-      period: 900,
-    });
-    BackgroundTask.statusAsync().then((e) => console.log(e));
-  }, []);
+  // useEffect(() => {
+  //   Geolocation.watchPosition((e) => {
+  //     console.log(12233, e);
+  //   });
+  //   return () => {
+  //     Geolocation.stopObserving();
+  //   };
+  // }, []);
+  // useEffect(() => {
+  //   BackgroundTask.schedule({
+  //     period: 900,
+  //   });
+  //   BackgroundTask.statusAsync().then((e) => console.log(e));
+  // }, []);
   return (
     <>
       <WrapperWebView
