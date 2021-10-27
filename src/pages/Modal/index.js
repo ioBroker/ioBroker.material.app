@@ -83,9 +83,7 @@ const Modal = ({ navigation, route: { params } }) => {
       const dim = Dimensions.get('screen');
       return dim.height >= dim.width;
     };
-    Dimensions.addEventListener("change", () => {
-      setPortrait(!!isPortrait());
-    });
+    Dimensions.addEventListener('change', () => setPortrait(!!isPortrait()));
   }, []);
 
   const {
@@ -99,22 +97,20 @@ const Modal = ({ navigation, route: { params } }) => {
   // const arrLangIndexCurrentNext =
   //   arrLangIndexCurrent < arrLang.length - 1 ? arrLangIndexCurrent + 1 : 0;
 
-  const { switchObj, emailObj, passwordObj, ssidObj, localObj } =
+  const { remoteObj, emailObj, passwordObj, ssidObj, localObj, instanceObj } =
     useContext(ContextWrapperCreate);
   const [secure, setSecure] = useState(true);
-  const [switchValue, setSwitchValue] = useState(switchObj.switchValue);
+  const [remoteValue, setRemoteValue] = useState(remoteObj.remoteValue);
   const [emailValue, setEmailValue] = useState(emailObj.emailValue);
   const [passwordValue, setPasswordValue] = useState(passwordObj.passwordValue);
   const [ssidValue, setSsidValue] = useState(ssidObj.ssidValue);
   const [localValue, setLocalValue] = useState(localObj.localValue);
-  const [gpsValue, setGpshValue] = useState(false);
-  const [instanceValue, setInstancehValue] = useState(
-    'material.0.app.kids.battery'
-  );
+  //const [gpsValue, setGpshValue] = useState(false);
+  const [instanceValue, setInstanceValue] = useState(instanceObj.instanceValue || 'app');
 
   const saveSettings = () => {
-    if (switchObj.switchValue !== switchValue) {
-      switchObj.setSwitchValue(switchValue);
+    if (remoteObj.remoteValue !== remoteValue) {
+      remoteObj.setRemoteValue(remoteValue);
     }
     if (emailObj.emailValue !== emailValue) {
       emailObj.setEmailValue(emailValue);
@@ -128,14 +124,18 @@ const Modal = ({ navigation, route: { params } }) => {
     if (localObj.localValue !== localValue) {
       localObj.setLocalValue(localValue);
     }
+    if (instanceObj.instanceValue !== instanceValue) {
+      instanceObj.setInstanceValue(instanceValue);
+    }
   };
 
   const checkChanges =
-    switchObj.switchValue === switchValue &&
+    remoteObj.remoteValue === remoteValue &&
     emailObj.emailValue === emailValue &&
     passwordObj.passwordValue === passwordValue &&
     ssidObj.ssidValue === ssidValue &&
-    localObj.localValue === localValue;
+    localObj.localValue === localValue &&
+    instanceObj.instanceValue === instanceValue;
 
   return (
     <TouchableWithoutFeedback
@@ -146,7 +146,7 @@ const Modal = ({ navigation, route: { params } }) => {
         <HeadWrapper style={{ ...shadow, flex: portrait ? 0 : 1 }}>
           <Heading>{t('Settings')}</Heading>
           <TextCustom>
-            {t("you can slide right to left to show settings button")}
+            {t('you can slide right to left to show settings button')}
           </TextCustom>
           {/* <WrapperSlider>
             <TouchableOpacity
@@ -204,14 +204,14 @@ const Modal = ({ navigation, route: { params } }) => {
                       ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
                     })
                   ).then((res) => {
-                    if (res === "granted") {
+                    if (res === 'granted') {
                       if (netInfo?.details?.ssid) {
                         setSsidValue(netInfo.details.ssid);
                       } else {
                         setSsidValue('error');
                       }
                     } else {
-                      Alert.alert(t("Location is not enabled"));
+                      Alert.alert(t('Location is not enabled'));
                     }
                   });
                 }}
@@ -219,19 +219,19 @@ const Modal = ({ navigation, route: { params } }) => {
             </WrapperTextInput>
             <CermConditionsWrapper>
               <BaseSwitch
-                onValueChange={setSwitchValue}
-                value={switchValue}
+                onValueChange={setRemoteValue}
+                value={remoteValue}
                 addTextOn=""
                 addTextOff=" "
               />
-              <TouchableOpacity onPress={() => setSwitchValue(!switchValue)}>
-                <PreshTextCustom bool={switchValue}>
+              <TouchableOpacity onPress={() => setRemoteValue(!remoteValue)}>
+                <PreshTextCustom bool={remoteValue}>
                   {t('Remote access via ioBroker.pro')}
                 </PreshTextCustom>
               </TouchableOpacity>
             </CermConditionsWrapper>
 
-            {switchValue && (
+            {remoteValue && (
               <WrapperTextInput>
                 <BaseTextInput
                   onChangeText={setEmailValue}
@@ -251,7 +251,7 @@ const Modal = ({ navigation, route: { params } }) => {
                 />
               </WrapperTextInput>
             )}
-            <CermConditionsWrapper>
+            {/*<CermConditionsWrapper>
               <BaseSwitch
                 onValueChange={setGpshValue}
                 value={gpsValue}
@@ -263,10 +263,10 @@ const Modal = ({ navigation, route: { params } }) => {
                   {t('send GPS and battery to ioBroker')}
                 </PreshTextCustom>
               </TouchableOpacity>
-            </CermConditionsWrapper>
+            </CermConditionsWrapper>*/}
             <WrapperTextInput>
               <BaseTextInput
-                onChangeText={setInstancehValue}
+                onChangeText={setInstanceValue}
                 value={instanceValue}
                 placeholder={t('Instance')}
                 topText

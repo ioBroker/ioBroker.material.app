@@ -1,24 +1,22 @@
-import React, { createContext } from "react";
-import { useStateLocal } from "../../services/hooks/useStateLocal";
+import React, { createContext } from 'react';
+import { useStateLocal } from '../../services/hooks/useStateLocal';
 
 export const ContextWrapperCreate = createContext();
 
 export const ContextWrapper = ({ children }) => {
-  const [switchValue, setSwitchValue] = useStateLocal(false, "switch");
-  const [emailValue, setEmailValue] = useStateLocal("", "email");
-  const [passwordValue, setPasswordValue] = useStateLocal("", "password");
-  const [ssidValue, setSsidValue] = useStateLocal("", "ssid");
-  const [localValue, setLocalValue] = useStateLocal(
-    "http://localhost:8082",
-    "local"
-  );
+  const [remoteValue, setRemoteValue] = useStateLocal(false, 'remote');
+  const [emailValue, setEmailValue] = useStateLocal('', 'email');
+  const [passwordValue, setPasswordValue] = useStateLocal("", 'password');
+  const [ssidValue, setSsidValue] = useStateLocal('', 'ssid');
+  const [localValue, setLocalValue] = useStateLocal('http://localhost:8082', 'local');
+  const [instanceValue, setInstanceValue] = useStateLocal('app','instance');
 
   return (
     <ContextWrapperCreate.Provider
       value={{
-        switchObj: {
-          switchValue,
-          setSwitchValue,
+        remoteObj: {
+          remoteValue,
+          setRemoteValue,
         },
         emailObj: {
           emailValue,
@@ -35,6 +33,10 @@ export const ContextWrapper = ({ children }) => {
         localObj: {
           localValue,
           setLocalValue,
+        },
+        instanceObj: {
+          instanceValue,
+          setInstanceValue,
         },
       }}
     >

@@ -4,30 +4,30 @@ import React, {
   useState,
   useEffect,
   useCallback,
-} from "react";
-import { WebView } from "react-native-webview";
-import styled from "styled-components";
-// import WifiManager from "react-native-wifi-reborn";
-// import Geolocation from "@react-native-community/geolocation";
+} from 'react';
+import { WebView } from 'react-native-webview';
+import styled from 'styled-components';
+// import WifiManager from 'react-native-wifi-reborn';
+// import Geolocation from '@react-native-community/geolocation';
 
-import { ContextWrapperCreate } from "../../components/ContextWrapper";
-import MyTabBar from "../../components/MyTabBar";
-import { Alert } from "react-native";
-import { useTranslation } from "react-i18next";
-import { ScrollView } from "react-native";
-import { RefreshControl } from "react-native";
+import { ContextWrapperCreate } from '../../components/ContextWrapper';
+import MyTabBar from '../../components/MyTabBar';
+import { Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { ScrollView } from 'react-native';
+import { RefreshControl } from 'react-native';
 import { useNetInfo } from '@react-native-community/netinfo';
-import { useSwipe } from "../../services/hooks/useSwipe";
-import { Platform } from "react-native";
+import { useSwipe } from '../../services/hooks/useSwipe';
+import { Platform } from 'react-native';
 import {
   h_normalize,
   styled_t_r_b_l_normalize,
   w_normalize,
-} from "../../services/helpers/normalizeSize";
+} from '../../services/helpers/normalizeSize';
 // import BackgroundTask from 'react-native-background-task';
-import BaseButton from "../../components/BaseButton";
-import { View } from "react-native";
-import refreshIcon from "../../../assets/refresh.png";
+import BaseButton from '../../components/BaseButton';
+import { View } from 'react-native';
+import refreshIcon from '../../../assets/refresh.png';
 
 // BackgroundTask.define(() => {
 //   // Geolocation.getCurrentPosition((info) => console.log(info));
@@ -40,6 +40,10 @@ function buildLocalUrl(url) {
   // check if material, admin, vis, echarts
   if (url.includes(':3000') || url.includes('/material')) {
     return url;
+  } else if (url.endsWith('vis/')) {
+    return url;
+  } else if (url.endsWith('vis')) {
+    return url + '/';
   } else if (url.endsWith('/')) {
     return url + 'material/';
   } else {
@@ -48,13 +52,11 @@ function buildLocalUrl(url) {
 }
 
 const WebViewComponent = ({ navigation }) => {
-  const { switchObj, emailObj, passwordObj, ssidObj, localObj } =
+  const { remoteObj, emailObj, passwordObj, ssidObj, localObj, instanceObj } =
     useContext(ContextWrapperCreate);
 
   const [useLocal, setUseLocal] = useState(true);
-  const [uriLocal, setUriLocal] = useState(
-    `${buildLocalUrl(localObj.localValue)}?t=${Date.now()}`
-  );
+  const [uriLocal, setUriLocal] = useState(`${buildLocalUrl(localObj.localValue)}?t=${Date.now()}`);
   const netInfo = useNetInfo();
 
   const refWebView = useRef();
@@ -67,7 +69,7 @@ const WebViewComponent = ({ navigation }) => {
   useEffect(() => {
     if (
       ssidObj.ssidValue &&
-      switchObj.switchValue &&
+      remoteObj.remoteValue &&
       emailObj.emailValue &&
       passwordObj.passwordValue
     ) {
@@ -87,7 +89,7 @@ const WebViewComponent = ({ navigation }) => {
   }, [
     netInfo,
     ssidObj.ssidValue,
-    switchObj.switchValue,
+    remoteObj.remoteValue,
     emailObj.emailValue,
     passwordObj.passwordValue,
   ]);
@@ -107,9 +109,7 @@ const WebViewComponent = ({ navigation }) => {
     (!emailObj.emailValue || !passwordObj.passwordValue)
   ) {
     // Show text. No local URL found
-    warning = t(
-      'iobroker.pro settings or local url not found! Please set it settings.'
-    );
+    warning = t('iobroker.pro settings or local url not found! Please set it settings.');
   } else if (useLocal && !localObj.localValue) {
     setUseLocal(false);
   }
@@ -152,6 +152,7 @@ const WebViewComponent = ({ navigation }) => {
   //   });
   //   BackgroundTask.statusAsync().then((e) => console.log(e));
   // }, []);
+
   return (
     <>
       <WrapperWebView
@@ -170,7 +171,10 @@ const WebViewComponent = ({ navigation }) => {
         {!warning ? (
           <WebViewContent
             ref={refWebView}
+
             startInLoadingState
+            injectedJavaScript={`window.__material_instance = '${instanceObj.instanceValue}'`}
+
             //           injectedJavaScript={`
             //   (function() {
             //     window.onscroll=function(){window.postMessage(document.documentElement.scrollTop||document.body.scrollTop)}
@@ -191,14 +195,15 @@ const WebViewComponent = ({ navigation }) => {
 
             //   true;
             // `}
+            onMessage={event => {}}
             // onMessage={({ nativeEvent: state }) => {
             //   console.log(11223344, state.data);
-            //   if (state.data === "navigationStateChange") {
+            //   if (state.data === 'navigationStateChange') {
             //     // Navigation state updated, can check state.canGoBack, etc.
             //     const url = state.url;
             //     if (
-            //       (showSettings && url.includes("/chart/")) ||
-            //       url.includes("/dialog/")
+            //       (showSettings && url.includes('/chart/')) ||
+            //       url.includes('/dialog/')
             //     ) {
             //       setShowSettings(false);
             //     } else if (!showSettings) {
@@ -212,29 +217,45 @@ const WebViewComponent = ({ navigation }) => {
             //     // }
             //   }
             // }}
-            onError={(err) => {
-              Alert.alert(t('Error'), t('Redirect to iobroker.pro?'), [
-                {
-                  text: t('No'),
-                  style: 'cancel',
-                },
-                {
-                  text: t('Yes'),
-                  onPress: () => {
-                    const newURL = 'https://iobroker.pro';
-                    const redirectTo = `window.location = "${newURL}"`;
-                    refWebView.current?.injectJavaScript(redirectTo);
+            onError={err => {
+              if (remoteObj.remoteValue && emailObj.emailValue && passwordObj.passwordValue) {
+                Alert.alert(t('Cannot reach local server'), t('Redirect to iobroker.pro?'), [
+                  {
+                    text: t('Open settings'),
+                    style: 'cancel',
+                    onPress: () => {
+                      navigation.navigate('Modal');
+                    },
                   },
-                },
-              ]);
+                  {
+                    text: t('Go to pro'),
+                    onPress: () => {
+                      const newURL = 'https://iobroker.pro';
+                      const redirectTo = `window.location = '${newURL}'`;
+                      refWebView.current?.injectJavaScript(redirectTo);
+                    },
+                  },
+                ]);
+              } else {
+                Alert.alert(t('Cannot reach local server'), t('Open settings?'), [
+                  {
+                    text: t('Hide warning'),
+                    style: 'cancel',
+                  },
+                  {
+                    text: t('Open settings'),
+                    onPress: () => {
+                      setTimeout(() => navigation.navigate('Modal'), 200);
+                    },
+                  },
+                ], {
+                  cancelable: true
+                });
+              }
             }}
-            renderLoading={() => {
-              setRefreshing(true);
-            }}
-            onLoadEnd={() => {
-              setRefreshing(false);
-            }}
-            onNavigationStateChange={(newNavState) => {
+            renderLoading={() => setRefreshing(true)}
+            onLoadEnd={() => setRefreshing(false)}
+            onNavigationStateChange={newNavState => {
               const { url } = newNavState;
               if (!url) {
                 return;
@@ -242,7 +263,7 @@ const WebViewComponent = ({ navigation }) => {
 
               if (url.includes('login?app=true')) {
                 const newURL = 'https://iobroker.pro/material/index.html?app=true';
-                const redirectTo = `window.location = "${newURL}"`;
+                const redirectTo = `window.location = '${newURL}'`;
                 refWebView.current?.injectJavaScript(redirectTo);
               }
               /*refWebView.current?.injectJavaScript(`
@@ -287,6 +308,7 @@ const WebViewComponent = ({ navigation }) => {
       </WrapperWebView>
 
       {showSettings ? <MyTabBar navigation={navigation} /> : null}
+
       {Platform.os !== 'ios' && showSettings ? (
         <WrapperTabBar>
           <BaseButton

@@ -23,6 +23,8 @@ import expo.modules.updates.UpdatesController;
 
 import com.facebook.react.bridge.JSIModulePackage;
 import com.swmansion.reanimated.ReanimatedJSIModulePackage;
+import android.webkit.WebView;
+
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -84,6 +86,9 @@ public class MainApplication extends Application implements ReactApplication {
   @Override
   public void onCreate() {
     super.onCreate();
+
+    WebView.setWebContentsDebuggingEnabled(true);
+
     SoLoader.init(this, /* native exopackage */ false);
     // BackgroundTaskPackage.useContext(this);
     if (!BuildConfig.DEBUG) {
