@@ -135,8 +135,8 @@ android {
         applicationId "com.iobrokermaterial"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "2.1"
     }
     splits {
         abi {
@@ -148,16 +148,16 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            storeFile file('ioBroker.material.keystore')
+            storePassword 'xxx'
+            keyAlias 'ioBroker.material'
+            keyPassword 'xxx'
         }
         release {
             storeFile file('ioBroker.material.keystore')
-            storePassword 'XXX'
+            storePassword 'xxx'
             keyAlias 'ioBroker.material'
-            keyPassword 'XXX'
+            keyPassword 'xxx'
         }
     }
     buildTypes {
