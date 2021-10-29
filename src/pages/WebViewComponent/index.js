@@ -171,7 +171,6 @@ const WebViewComponent = ({ navigation }) => {
         {!warning ? (
           <WebViewContent
             ref={refWebView}
-
             startInLoadingState
             injectedJavaScript={`window.__material_instance = '${instanceObj.instanceValue}'`}
 
