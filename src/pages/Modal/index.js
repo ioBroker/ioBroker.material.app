@@ -21,7 +21,7 @@ import { PermissionsAndroid } from 'react-native';
 import { ContextWrapperCreate } from '../../components/ContextWrapper';
 import { Platform } from 'react-native';
 import { Dimensions } from 'react-native';
-import { useNetInfo } from '@react-native-community/netinfo';
+import NetInfo  from '@react-native-community/netinfo';
 import { PERMISSIONS, request } from 'react-native-permissions';
 import { Alert } from 'react-native';
 
@@ -60,8 +60,6 @@ const shadow = {
 
 const Modal = ({ navigation, route: { params } }) => {
   const [portrait, setPortrait] = useState(true);
-
-  const netInfo = useNetInfo();
 
   useEffect(() => {
     if (Platform.OS !== 'ios') {
@@ -203,17 +201,22 @@ const Modal = ({ navigation, route: { params } }) => {
                       android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
                       ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
                     })
-                  ).then((res) => {
-                    if (res === 'granted') {
-                      if (netInfo?.details?.ssid) {
-                        setSsidValue(netInfo.details.ssid);
+                  )
+                    .then(res => {
+                      if (res === 'granted') {
+                        NetInfo.fetch('wifi')
+                          .then(state => {
+                            if (state?.details?.ssid) {
+                              setSsidValue(state.details.ssid);
+                            } else {
+                              setSsidValue('error');
+                            }
+                          });
+
                       } else {
-                        setSsidValue('error');
+                        Alert.alert(t('Location is not enabled'));
                       }
-                    } else {
-                      Alert.alert(t('Location is not enabled'));
-                    }
-                  });
+                    });
                 }}
               />
             </WrapperTextInput>
